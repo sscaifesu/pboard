@@ -66,6 +66,37 @@
 - 使用有意义的变量名和函数名。
 - 编写清晰的注释。
 
-## 许可证
+## 提交信息规范
 
-本项目采用 Apache License 2.0 许可证。详细信息请参阅 [LICENSE](LICENSE)。
+我们使用 [Conventional Commits](https://www.conventionalcommits.org/) 规范。请确保您的提交信息遵循以下格式:
+
+```
+<type>[optional scope]: <description>
+
+[optional body]
+
+[optional footer(s)]
+```
+
+例如:
+```
+feat(login): add remember me checkbox
+```
+
+## 测试
+
+在提交 PR 之前,请确保运行并通过所有测试:
+
+```
+npm test
+```
+
+## 文档
+
+如果您的更改影响了用户体验或需要新的使用说明,请更新相应的文档。
+
+## 问题和讨论
+
+如果您有任何问题或想法,欢迎在 GitHub Discussions 中提出。
+
+再次感谢您的贡献!

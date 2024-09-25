@@ -1,6 +1,6 @@
 # Pboard
 
-[Pboard](https://github.com/sscaifesu/pboard) 是一个为 Proxmox VE (PVE) 设计的轻量级、现代化的管理界面。它提供了一个直观、响应迅速的 Web 用户界面,用于管理和监控您的 PVE 环境。
+Pboard 是一个为 Proxmox VE (PVE) 设计的轻量级、现代化的管理界面。它提供了一个直观、响应迅速的 Web 用户界面,用于管理和监控您的 PVE 环境。
 
 ## 功能特点
 
@@ -38,9 +38,32 @@
 
 4. 在浏览器中打开 [http://localhost:3000](http://localhost:3000) 查看应用。
 
-## Todo
+## 构建生产版本
 
-Todo 计划
+运行以下命令构建生产版本:
 
-- [ ] 添加更多认证方式
-- [ ] 添加后台管理
+```
+npm run build
+```
+
+构建后的文件将位于 `build` 目录中。
+
+## 贡献
+
+欢迎贡献代码、报告问题或提出新功能建议。请遵循以下步骤:
+
+1. Fork 本仓库
+2. 创建您的特性分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交您的更改 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
+5. 开启一个 Pull Request
+
+## 许可证
+
+本项目采用 Apache License 2.0 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
+
+## 联系方式
+
+项目维护者: evalEvil
+
+项目链接: [Pboard](https://github.com/sscaifesu/pboard)

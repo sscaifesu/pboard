@@ -1,36 +1,31 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 
 interface SettingsDialogProps {
   isOpen: boolean;
-  onClose: () => void;
+  onClose: (server: string, port: string) => void;
+  initialServer: string;
+  initialPort: string;
 }
 
-const SettingsDialog: React.FC<SettingsDialogProps> = ({ isOpen, onClose }) => {
-  const [server, setServer] = useState('');
-  const [port, setPort] = useState('');
+const SettingsDialog: React.FC<SettingsDialogProps> = React.memo(({ isOpen, onClose, initialServer, initialPort }) => {
+  const [server, setServer] = useState(initialServer);
+  const [port, setPort] = useState(initialPort);
   const [authMethod, setAuthMethod] = useState('pam');
   const [isAuthMethodOpen, setIsAuthMethodOpen] = useState(false);
   const authMethodRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // 从本地存储加载数据
-    const savedServer = localStorage.getItem('server');
-    const savedPort = localStorage.getItem('port');
+    setServer(initialServer);
+    setPort(initialPort);
     const savedAuthMethod = localStorage.getItem('authMethod');
-    if (savedServer) setServer(savedServer);
-    if (savedPort) setPort(savedPort);
     if (savedAuthMethod) setAuthMethod(savedAuthMethod);
-  }, []);
+  }, [initialServer, initialPort]);
 
   useEffect(() => {
-    // 保存数据到本地存储
-    localStorage.setItem('server', server);
-    localStorage.setItem('port', port);
     localStorage.setItem('authMethod', authMethod);
-  }, [server, port, authMethod]);
+  }, [authMethod]);
 
   useEffect(() => {
-    // 点击外部关闭下拉菜单
     const handleClickOutside = (event: MouseEvent) => {
       if (authMethodRef.current && !authMethodRef.current.contains(event.target as Node)) {
         setIsAuthMethodOpen(false);
@@ -43,29 +38,31 @@ const SettingsDialog: React.FC<SettingsDialogProps> = ({ isOpen, onClose }) => {
     };
   }, []);
 
-  const handleReset = () => {
+  const handleReset = useCallback(() => {
     setServer('');
     setPort('');
     setAuthMethod('pam');
-  };
+  }, []);
 
-  const handlePortChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePortChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    // 只允许输入数字,并且端口范围在 1-65535 之间
     if (value === '' || (/^\d+$/.test(value) && parseInt(value) >= 1 && parseInt(value) <= 65535)) {
       setPort(value);
     }
-  };
+  }, []);
 
-  const toggleAuthMethod = () => {
-    setIsAuthMethodOpen(!isAuthMethodOpen);
-  };
+  const toggleAuthMethod = useCallback(() => {
+    setIsAuthMethodOpen((prev) => !prev);
+  }, []);
 
-  const selectAuthMethod = (method: string) => {
+  const selectAuthMethod = useCallback((method: string) => {
     setAuthMethod(method);
     setIsAuthMethodOpen(false);
-    // 移除这里的 onClose() 调用
-  };
+  }, []);
+
+  const handleSave = useCallback(() => {
+    onClose(server, port);
+  }, [onClose, server, port]);
 
   return (
     <div 
@@ -88,7 +85,7 @@ const SettingsDialog: React.FC<SettingsDialogProps> = ({ isOpen, onClose }) => {
         <div className="relative">
           <button
             className="absolute -top-2 -right-2 bg-white bg-opacity-20 text-white hover:bg-opacity-30 rounded-full p-1 transition-all duration-300 ease-in-out transform hover:scale-110 focus:outline-none"
-            onClick={onClose}
+            onClick={handleSave}
             aria-label="关闭设置"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -167,7 +164,7 @@ const SettingsDialog: React.FC<SettingsDialogProps> = ({ isOpen, onClose }) => {
             <button
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-300 ease-in-out transform hover:scale-105 w-[45%]"
               type="button"
-              onClick={onClose}
+              onClick={handleSave}
             >
               保存
             </button>
@@ -183,6 +180,6 @@ const SettingsDialog: React.FC<SettingsDialogProps> = ({ isOpen, onClose }) => {
       </div>
     </div>
   );
-};
+});
 
 export default SettingsDialog;

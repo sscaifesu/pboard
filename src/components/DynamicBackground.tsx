@@ -13,64 +13,61 @@ const DynamicBackground: React.FC = () => {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
-    const particles: Particle[] = [];
-    const particleCount = 100;
+    const lineCount = 5;
+    const pointsPerLine = 1000;
+    const lines: { points: number[], phase: number, frequency: number, amplitude: number }[] = [];
 
-    class Particle {
-      x: number;
-      y: number;
-      size: number;
-      speedX: number;
-      speedY: number;
-      canvas: HTMLCanvasElement;
-
-      constructor(canvas: HTMLCanvasElement) {
-        this.canvas = canvas;
-        this.x = Math.random() * this.canvas.width;
-        this.y = Math.random() * this.canvas.height;
-        this.size = Math.random() * 3 + 1;
-        this.speedX = Math.random() * 2 - 1;
-        this.speedY = Math.random() * 2 - 1;
-      }
-
-      update() {
-        this.x += this.speedX;
-        this.y += this.speedY;
-
-        if (this.x < 0 || this.x > this.canvas.width) {
-          this.speedX *= -1;
-        }
-        if (this.y < 0 || this.y > this.canvas.height) {
-          this.speedY *= -1;
-        }
-      }
-
-      draw() {
-        if (ctx) {
-          ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-          ctx.beginPath();
-          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-          ctx.fill();
-        }
-      }
+    for (let i = 0; i < lineCount; i++) {
+      lines.push({
+        points: Array(pointsPerLine).fill(0),
+        phase: Math.random() * Math.PI * 2,
+        frequency: 0.5 + Math.random() * 1.5,
+        amplitude: 50 + Math.random() * 50
+      });
     }
 
-    const init = () => {
-      for (let i = 0; i < particleCount; i++) {
-        particles.push(new Particle(canvas));
-      }
-    };
+    const colors = [
+      'rgba(83, 227, 166, 0.5)',
+      'rgba(80, 163, 162, 0.5)',
+      'rgba(66, 133, 244, 0.5)'
+    ];
+
+    let time = 0;
 
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      for (const particle of particles) {
-        particle.update();
-        particle.draw();
-      }
+
+      lines.forEach((line, index) => {
+        ctx.beginPath();
+        ctx.strokeStyle = colors[index];
+        ctx.lineWidth = 2;
+
+        for (let i = 0; i < pointsPerLine; i++) {
+          const x = (i / pointsPerLine) * canvas.width;
+          const y = canvas.height / 2 + 
+                    Math.sin(i * 0.01 * line.frequency + line.phase + time) * line.amplitude +
+                    Math.sin(i * 0.02 * line.frequency + line.phase + time * 1.5) * (line.amplitude * 0.5) +
+                    Math.sin(i * 0.04 * line.frequency + line.phase + time * 0.5) * (line.amplitude * 0.25);
+
+          if (i === 0) {
+            ctx.moveTo(x, y);
+          } else {
+            ctx.lineTo(x, y);
+          }
+
+          line.points[i] = y;
+        }
+
+        ctx.stroke();
+
+        // 缓慢改变相位
+        line.phase += 0.003;
+      });
+
+      time += 0.01;
       requestAnimationFrame(animate);
     };
 
-    init();
     animate();
 
     const handleResize = () => {
@@ -85,7 +82,7 @@ const DynamicBackground: React.FC = () => {
     };
   }, []);
 
-  return <canvas ref={canvasRef} className="absolute top-0 left-0 w-full h-full -z-10" />;
+  return <canvas ref={canvasRef} className="fixed inset-0 z-0" />;
 };
 
 export default DynamicBackground;
